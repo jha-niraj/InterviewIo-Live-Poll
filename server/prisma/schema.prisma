@@ -1,0 +1,53 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+model Poll {
+    id            String     @id @default(uuid())
+    question      String
+    options       Option[]
+    correctAnswer String
+    status        String     @default("pending") // 'pending', 'active', 'closed'
+    timeLimit     Int        @default(60) // seconds
+    createdAt     DateTime   @default(now())
+    endedAt       DateTime?
+    responses     Response[]
+}
+
+model Option {
+    id        String     @id @default(uuid())
+    text      String
+    pollId    String
+    poll      Poll       @relation(fields: [pollId], references: [id], onDelete: Cascade)
+    responses Response[]
+}
+
+model Student {
+    id        String     @id @default(uuid())
+    name      String
+    sessionId String     @unique
+    joinedAt  DateTime   @default(now())
+    responses Response[]
+    isKicked  Boolean    @default(false)
+}
+
+model Response {
+    id         String   @id @default(uuid())
+    studentId  String
+    student    Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+    pollId     String
+    poll       Poll     @relation(fields: [pollId], references: [id], onDelete: Cascade)
+    optionId   String
+    option     Option   @relation(fields: [optionId], references: [id], onDelete: Cascade)
+    answeredAt DateTime @default(now())
+
+    @@unique([studentId, pollId])
+}

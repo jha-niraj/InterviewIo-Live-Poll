@@ -12,7 +12,7 @@ const httpServer = createServer(app);
 // Socket.io setup with CORS
 const io = new Server(httpServer, {
 	cors: {
-		origin: 'http://localhost:5173',
+		origin: ["http://localhost:5173", "https://interview-io-live-poll.vercel.app/"],
 		methods: ['GET', 'POST'],
 		credentials: true,
 	},
@@ -20,7 +20,7 @@ const io = new Server(httpServer, {
 
 // Middleware
 app.use(cors({
-	origin: 'http://localhost:5173',
+	origin: ["http://localhost:5173", "https://interview-io-live-poll.vercel.app/"],
 	credentials: true,
 }));
 app.use(express.json());

@@ -51,3 +51,49 @@ model Response {
 
     @@unique([studentId, pollId])
 }
+
+model Quiz {
+    id          String         @id @default(uuid())
+    title       String
+    topic       String
+    level       String         // 'easy', 'medium', 'hard'
+    createdBy   String         // Student session ID
+    creatorName String
+    questions   QuizQuestion[]
+    attempts    QuizAttempt[]
+    createdAt   DateTime       @default(now())
+}
+
+model QuizQuestion {
+    id            String       @id @default(uuid())
+    quizId        String
+    quiz          Quiz         @relation(fields: [quizId], references: [id], onDelete: Cascade)
+    question      String
+    options       String[]     // Array of options
+    correctAnswer String
+    order         Int
+    answers       QuizAnswer[]
+}
+
+model QuizAttempt {
+    id          String       @id @default(uuid())
+    quizId      String
+    quiz        Quiz         @relation(fields: [quizId], references: [id], onDelete: Cascade)
+    studentId   String       // Session ID
+    studentName String
+    score       Int
+    totalQuestions Int
+    answers     QuizAnswer[]
+    completedAt DateTime     @default(now())
+}
+
+model QuizAnswer {
+    id           String       @id @default(uuid())
+    attemptId    String
+    attempt      QuizAttempt  @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+    questionId   String
+    question     QuizQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+    selectedAnswer String
+    isCorrect    Boolean
+    answeredAt   DateTime     @default(now())
+}

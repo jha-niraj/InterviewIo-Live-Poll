@@ -10,7 +10,7 @@ const StudentNameEntry = () => {
 	const handleContinue = () => {
 		if (name.trim()) {
 			setStudentName(name.trim());
-			getSessionId(); // Ensure session ID is generated
+			getSessionId();
 			navigate('/student/poll');
 		}
 	};

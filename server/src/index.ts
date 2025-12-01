@@ -4,6 +4,7 @@ import { Server } from 'socket.io';
 import cors from 'cors';
 import pollRoutes from './routes/pollRoutes.js';
 import studentRoutes from './routes/studentRoutes.js';
+import quizRoutes from './routes/quizRoutes.js';
 import { setupSocketHandlers } from './socket/pollSocket.js';
 
 const app = express();
@@ -33,6 +34,7 @@ app.get('/', (req, res) => {
 // API Routes
 app.use('/api/v1/polls', pollRoutes);
 app.use('/api/v1/students', studentRoutes);
+app.use('/api/v1/quiz', quizRoutes);
 
 // Setup Socket.io handlers
 setupSocketHandlers(io);

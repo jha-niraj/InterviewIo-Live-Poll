@@ -173,6 +173,17 @@ const TeacherCreatePoll = ({ onCreatePoll }: Props) => {
 											/>
 											<span className="text-xs text-gray-600">Yes</span>
 										</label>
+										<label className="flex items-center gap-1 cursor-pointer">
+											<input
+												type="radio"
+												name={`not-correct-${index}`}
+												checked={correctAnswer !== option}
+												onChange={() => {}}
+												disabled={!option.trim()}
+												className="w-4 h-4 text-gray-400"
+											/>
+											<span className="text-xs text-gray-600">No</span>
+										</label>
 										{options.length > 2 && (
 											<button
 												onClick={() => handleRemoveOption(index)}

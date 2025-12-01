@@ -1,6 +1,5 @@
 import { io, Socket } from 'socket.io-client';
-
-const SOCKET_URL = 'https://interviewio-live-poll.onrender.com/';
+import { SOCKET_URL } from '../config/urls';
 
 let socket: Socket | null = null;
 

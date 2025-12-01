@@ -1,4 +1,5 @@
 {
     "kiroAgent.configureMCP": "Disabled",
-    "prisma.pinToPrisma6": true
+    "prisma.pinToPrisma6": true,
+    "typescript.autoClosingTags": false
 }

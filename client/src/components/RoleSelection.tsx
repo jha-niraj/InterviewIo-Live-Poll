@@ -23,7 +23,7 @@ const RoleSelection = () => {
 			<div className="w-full max-w-4xl rounded-xl p-16">
 				<div className="flex flex-col items-center justify-center">
 					<div className="mb-5">
-						<Badge text="InterVue" />
+						<Badge text="Intervue" />
 					</div>
 					<h1 className="text-3xl font-medium text-gray-900 mb-3">
 						Welcome to the <span className='font-bold'>Live Polling System</span>

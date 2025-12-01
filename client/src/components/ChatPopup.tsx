@@ -78,6 +78,15 @@ const ChatPopup = () => {
         return message.sender === currentUserName;
     };
 
+    const handleKickStudent = (studentId: string) => {
+        const socket = getSocket();
+        if (!socket || role !== 'teacher') return;
+
+        if (confirm('Are you sure you want to kick this student?')) {
+            socket.emit('teacher:remove-student', { studentId });
+        }
+    };
+
     return (
         <>
             <button
@@ -214,6 +223,15 @@ const ChatPopup = () => {
                                                                     )
                                                                 }
                                                                 <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                                                                {role === 'teacher' && (
+                                                                    <button
+                                                                        onClick={() => handleKickStudent(participant.id)}
+                                                                        className="ml-2 text-red-500 hover:text-red-700 text-xs font-semibold"
+                                                                        title="Kick student"
+                                                                    >
+                                                                        Kick
+                                                                    </button>
+                                                                )}
                                                             </div>
                                                         </div>
                                                     ))

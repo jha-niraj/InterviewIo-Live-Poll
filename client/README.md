@@ -1,156 +1,427 @@
-# Live Polling System - Client
+# 🎨 InterviewIO Client
 
-React + TypeScript + Tailwind CSS + Socket.io client for the Live Polling System.
+Frontend application for the InterviewIO Live Polling & Quiz System. Built with React 19, TypeScript, Redux Toolkit, and Tailwind CSS.
 
-## Features Implemented
+---
 
-### Core Features
-- ✅ Role selection (Teacher/Student)
-- ✅ Student name entry with unique session per tab
-- ✅ Teacher can create polls with multiple options
-- ✅ Students can submit answers
-- ✅ Live polling results with real-time updates
-- ✅ 60-second timer with countdown
-- ✅ Auto-close poll when all students answer
-- ✅ Teacher can manually stop polls
-- ✅ Participant list with answered status
-- ✅ Poll history view for teachers
+## 🚀 Quick Start
 
-### Bonus Features
-- ✅ Chat popup for teacher-student interaction
-- ✅ Student kick functionality
-- ✅ Responsive design matching Figma specs
-- ✅ Real-time percentage calculations
-- ✅ Animated progress bars
+### Prerequisites
+- Node.js 18+
+- Running backend server
 
-## Setup
+### Installation
 
-1. Install dependencies:
 ```bash
+# Navigate to client directory
+cd client
+
+# Install dependencies
 npm install
-```
 
-2. Start the development server:
-```bash
+# Start development server
 npm run dev
 ```
 
-The app will run on `http://localhost:5173`
+Application runs on `http://localhost:5173`
 
-## Project Structure
+---
+
+## 📁 Project Structure
 
 ```
 client/
 ├── src/
-│   ├── components/
-│   │   ├── RoleSelection.tsx       # Landing page - role selection
-│   │   ├── StudentNameEntry.tsx    # Student name input
-│   │   ├── StudentWaiting.tsx      # Waiting for poll screen
-│   │   ├── StudentPoll.tsx         # Student poll answering
-│   │   ├── TeacherCreatePoll.tsx   # Teacher poll creation form
-│   │   ├── TeacherDashboard.tsx    # Teacher main dashboard
-│   │   ├── PollResults.tsx         # Live results view
-│   │   └── ChatPopup.tsx           # Chat feature (bonus)
+│   ├── components/          # React components
+│   │   ├── Badge.tsx
+│   │   ├── ChatPopup.tsx
+│   │   ├── ErrorFallback.tsx
+│   │   ├── KickedUser.tsx
+│   │   ├── PollNotification.tsx
+│   │   ├── PollResults.tsx
+│   │   ├── QuizCreate.tsx
+│   │   ├── QuizList.tsx
+│   │   ├── QuizTake.tsx
+│   │   ├── RoleSelection.tsx
+│   │   ├── StudentNameEntry.tsx
+│   │   ├── StudentPoll.tsx
+│   │   ├── StudentWaiting.tsx
+│   │   ├── TeacherCreatePoll.tsx
+│   │   └── TeacherDashboard.tsx
+│   ├── config/
+│   │   └── urls.ts          # API & Socket URLs
+│   ├── store/
+│   │   ├── store.ts         # Redux store
+│   │   ├── quizSlice.ts     # Quiz state
+│   │   └── hooks.ts         # Typed hooks
 │   ├── types/
-│   │   └── index.ts                # TypeScript interfaces
+│   │   └── index.ts         # TypeScript types
 │   ├── utils/
-│   │   ├── socket.ts               # Socket.io client setup
-│   │   └── sessionStorage.ts       # Session management
-│   ├── App.tsx                     # Main app with routing
-│   ├── main.tsx                    # Entry point
-│   └── index.css                   # Tailwind CSS
+│   │   ├── socket.ts        # WebSocket client
+│   │   ├── sessionStorage.ts
+│   │   └── api-reference.ts # Axios reference
+│   ├── App.tsx              # Main app component
+│   ├── main.tsx             # Entry point
+│   └── index.css            # Global styles
+├── public/                  # Static assets
+├── .env                     # Environment variables
 └── package.json
 ```
 
-## User Flows
+---
 
-### Student Flow
-1. Select "I'm a Student"
-2. Enter name
-3. Wait for teacher to create poll
-4. Answer poll within 60 seconds
-5. View live results
-6. Wait for next question
+## 🎯 Key Features
 
-### Teacher Flow
-1. Select "I'm a Teacher"
-2. Create poll with question and options
-3. Mark correct answer
-4. View live results as students answer
-5. See participant list
-6. Stop poll manually or wait for auto-close
-7. Create new poll or view history
+### Real-time Polling
+- Live poll updates via WebSocket
+- Animated progress bars
+- Timer countdown
+- Instant result display
 
-## Socket.io Events
+### AI Quiz System
+- Browse available quizzes
+- Create quizzes with AI
+- Take quizzes with progress tracking
+- View leaderboard
+- Retry functionality
 
-### Emitted by Client
-- `student:join` - Student joins with name and sessionId
-- `student:submit-answer` - Student submits answer
-- `teacher:connect` - Teacher connects
-- `teacher:create-poll` - Teacher creates new poll
-- `teacher:stop-poll` - Teacher stops active poll
-- `teacher:remove-student` - Teacher kicks student
-- `teacher:get-history` - Teacher requests poll history
-- `chat:message` - Send chat message
+### Smart Notifications
+- **Poll notifications appear even while taking quizzes!**
+- Slide-in animation from top-right
+- Poll question preview
+- Quick navigation to poll
+- Dismiss option
 
-### Received by Client
-- `student:joined` - Confirmation of student join
-- `poll:new` - New poll created
-- `poll:update` - Live results update
-- `poll:ended` - Poll has ended
-- `participants:update` - Participant list updated
-- `student:kicked` - Student was removed
-- `poll:history` - Poll history data
-- `chat:message` - New chat message
-- `error` - Error occurred
+### Communication
+- Real-time chat
+- Participant list
+- Role-based message styling
+- Auto-scroll to latest
 
-## Design System
+### State Management
+- Redux for quiz data
+- Eliminates redundant API calls
+- Proper cleanup on unmount
 
-### Colors
-- Primary: Purple (#7c3aed / purple-600)
-- Background: Gray (#f5f5f5 / gray-50)
-- Text: Dark Gray (#1a1a1a / gray-900)
-- Border: Light Gray (#e5e7eb / gray-200)
+---
 
-### Typography
-- Headings: Bold, 24-32px
-- Body: Regular, 14-16px
-- Labels: Semibold, 12-14px
+## 🔔 Poll Notification System
 
-### Components
-- Buttons: Rounded (8px), Purple background
-- Cards: White background, subtle shadow
-- Inputs: 2px border, rounded (8px)
-- Badge: Purple, rounded-full
+**How it works:**
 
-## Environment Variables
+1. Student is on any quiz page (`/quiz`, `/quiz/create`, `/quiz/:id`)
+2. Teacher creates a poll
+3. Notification slides in from top-right corner
+4. Shows poll question preview
+5. Student can:
+   - Click "Join Poll" → Navigate to poll page
+   - Click "Later" → Dismiss notification
+6. Notification auto-hides when poll ends
 
-Create a `.env` file if you need to change the backend URL:
+**Component:** `PollNotification.tsx`
 
-```
-VITE_API_URL=http://localhost:3000
+```typescript
+// Listens for new polls
+socket.on('poll:new', (data) => {
+    setPollQuestion(data.poll.question);
+    setShowNotification(true);
+});
+
+// Auto-hide when poll ends
+socket.on('poll:ended', () => {
+    setShowNotification(false);
+});
 ```
 
-## Building for Production
+---
+
+## 🗺️ Routes
+
+```typescript
+// Main routes
+/                          # Role selection
+/student/name              # Student name entry
+/student/poll              # Student poll page
+/teacher/create            # Teacher dashboard
+
+// Quiz routes
+/quiz                      # Quiz list
+/quiz/create               # Create quiz
+/quiz/:quizId              # Take quiz
+```
+
+---
+
+## 🎨 Components Overview
+
+### Core Components
+
+**RoleSelection** - Choose teacher or student role  
+**StudentNameEntry** - Enter name to join  
+**StudentPoll** - Answer polls and view results  
+**StudentWaiting** - Wait for teacher's poll  
+**TeacherDashboard** - Create polls and manage students  
+**TeacherCreatePoll** - Poll creation form  
+**PollResults** - Display live results
+
+### Quiz Components
+
+**QuizList** - Browse all quizzes  
+**QuizCreate** - Generate quiz with AI  
+**QuizTake** - Take quiz with leaderboard
+
+### Utility Components
+
+**ChatPopup** - Real-time chat with tabs  
+**PollNotification** - Poll alerts on quiz pages  
+**ErrorFallback** - Error handling UI  
+**KickedUser** - Kicked student screen  
+**Badge** - Reusable badge component
+
+---
+
+## 🔌 WebSocket Integration
+
+### Socket Initialization
+
+```typescript
+// Initialize socket
+import { initSocket, getSocket } from './utils/socket';
+
+const socket = initSocket();
+
+// Listen for events
+socket.on('poll:new', (data) => {
+    // Handle new poll
+});
+
+// Emit events
+socket.emit('student:join', { name, sessionId });
+```
+
+### Auto-initialization in ChatPopup
+
+ChatPopup automatically initializes socket if not already connected:
+
+```typescript
+// Ensures socket exists
+let socket = getSocket();
+if (!socket) {
+    socket = initSocket();
+    
+    // Auto-register based on role
+    if (role === 'student') {
+        socket.emit('student:join', { name, sessionId });
+    }
+}
+```
+
+---
+
+## 🎨 Styling
+
+### Tailwind CSS Configuration
+
+```javascript
+// tailwind.config.js
+theme: {
+    extend: {
+        colors: {
+            purple: { 600: '#8F64E1' },
+            blue: { 600: '#1D68BD' }
+        },
+        animation: {
+            'slide-in': 'slide-in 0.3s ease-out'
+        }
+    }
+}
+```
+
+### Design System
+
+- **Primary Gradient**: `from-[#8F64E1] to-[#1D68BD]`
+- **Background**: `bg-[#F2F2F2]`
+- **Buttons**: `rounded-3xl` with gradient
+- **Cards**: `rounded-xl` with shadow
+- **Animations**: Smooth transitions
+
+---
+
+## 🔧 Configuration
+
+### Environment Variables
 
 ```bash
-npm run build
+# .env
+VITE_SOCKET_URL=http://localhost:3000
 ```
 
-The build output will be in the `dist` folder.
+### URL Configuration
 
-## Technologies Used
+```typescript
+// src/config/urls.ts
+const isDevelopment = import.meta.env.DEV;
 
-- React 19
-- TypeScript
-- Tailwind CSS 3
-- Socket.io Client
-- React Router DOM
-- Vite
+export const SERVER_URL = isDevelopment 
+    ? 'http://localhost:3000'
+    : 'https://your-backend.onrender.com';
 
-## Notes
+export const serverUrl = `${SERVER_URL}/api/v1`;
+export const SOCKET_URL = SERVER_URL;
+```
 
-- Each browser tab gets a unique session ID
-- Student names are stored in sessionStorage
-- Real-time updates use Socket.io WebSocket connection
-- UI matches Figma design specifications exactly
+---
+
+## 🛠️ Available Scripts
+
+```bash
+# Development
+npm run dev              # Start dev server
+
+# Build
+npm run build            # Build for production
+npm run preview          # Preview production build
+
+# Linting
+npm run lint             # Run ESLint
+```
+
+---
+
+## 📦 Dependencies
+
+### Core
+- **react** (19.x) - UI library
+- **react-router-dom** - Routing
+- **socket.io-client** - WebSocket client
+- **axios** - HTTP client
+- **@reduxjs/toolkit** - State management
+- **react-redux** - Redux bindings
+
+### UI
+- **tailwindcss** - Utility-first CSS
+- **@tailwindcss/forms** - Form styles
+
+### Dev Tools
+- **typescript** - Type safety
+- **vite** - Build tool
+- **eslint** - Linting
+
+---
+
+## 🚢 Deployment
+
+### Vercel Deployment
+
+1. **Connect Repository**
+   - Import from GitHub
+   - Select `client` as root directory
+
+2. **Configure Build**
+   - Build Command: `npm run build`
+   - Output Directory: `dist`
+   - Install Command: `npm install`
+
+3. **Environment Variables**
+   ```
+   VITE_SOCKET_URL=https://your-backend.onrender.com
+   ```
+
+4. **Deploy**
+   - Click "Deploy"
+   - Wait for build to complete
+
+---
+
+## 🎯 User Flows
+
+### Teacher Flow
+```
+Role Selection → Create Poll → View Live Results → 
+Stop Poll → View History / Create New Poll
+```
+
+### Student Flow
+```
+Role Selection → Enter Name → Wait for Poll → 
+Answer Poll → View Results → Wait for Next Poll
+
+OR
+
+Browse Quizzes → Take Quiz → View Results → 
+See Leaderboard → Retry / Take Another
+```
+
+---
+
+## 🐛 Troubleshooting
+
+**WebSocket Not Connecting:**
+```bash
+# Check VITE_SOCKET_URL in .env
+# Verify backend is running
+# Check browser console for errors
+```
+
+**Messages Not Appearing:**
+```bash
+# Check browser console for:
+# "🔌 Initializing socket in ChatPopup"
+# "📤 Sending message: ..."
+# "📨 Received chat message: ..."
+```
+
+**Poll Notifications Not Showing:**
+```bash
+# Verify socket connection
+# Check if student has joined session
+# Look for "poll:new" event in console
+```
+
+**Redux State Issues:**
+```bash
+# Install Redux DevTools extension
+# Check state in DevTools
+# Verify actions are dispatched
+```
+
+---
+
+## 📖 Additional Documentation
+
+- **[Main README](../README.md)** - Project overview
+- **[Server README](../server/README.md)** - Backend documentation
+- **[WebSocket Guide](../CHAT_WEBSOCKET_GUIDE.md)** - Complete WebSocket guide
+- **[Quick Reference](../CHAT_QUICK_REFERENCE.md)** - Quick WebSocket reference
+
+---
+
+## 🎨 UI Components Gallery
+
+### Notifications
+- Slide-in animation
+- Pulse indicator
+- Gradient background
+- Action buttons
+
+### Chat
+- Tabbed interface (Chat/Participants)
+- Role-based styling
+- Auto-scroll
+- Real-time updates
+
+### Leaderboard
+- Top 5 display
+- Medal indicators (🥇🥈🥉)
+- Score percentages
+- Empty state
+
+### Error Handling
+- Professional error UI
+- Retry functionality
+- Multiple recovery options
+- Helpful tips
+
+---
+
+**Built with ❤️ using React, TypeScript, Redux, and Tailwind CSS**

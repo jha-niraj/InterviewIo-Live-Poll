@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { serverUrl } from '../config/urls';
@@ -7,6 +7,7 @@ import { useAppSelector, useAppDispatch } from '../store/hooks';
 import { setCurrentQuiz, clearCurrentQuiz } from '../store/quizSlice';
 import Badge from './Badge';
 import ChatPopup from './ChatPopup';
+import PollNotification from './PollNotification';
 import ErrorFallback from './ErrorFallback';
 
 interface Question {
@@ -15,6 +16,14 @@ interface Question {
     options: string[];
     correctAnswer: string;
     order: number;
+}
+
+interface Attempt {
+    id: string;
+    studentName: string;
+    score: number;
+    totalQuestions: number;
+    completedAt: Date;
 }
 
 interface Quiz {
@@ -26,23 +35,17 @@ interface Quiz {
     creatorName?: string;
     createdAt?: string;
     questions: Question[];
-    attempts?: Array<{
-        id: string;
-        studentName: string;
-        score: number;
-        totalQuestions: number;
-        completedAt: Date;
-    }>;
+    attempts?: Attempt[];
 }
 
 const QuizTake = () => {
     const { quizId } = useParams<{ quizId: string }>();
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
-    
+
     // Get quiz from Redux store
     const quizFromStore = useAppSelector((state) => state.quiz.currentQuiz);
-    
+
     const [quiz, setQuiz] = useState<Quiz | null>(quizFromStore);
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [answers, setAnswers] = useState<Record<string, string>>({});
@@ -54,6 +57,33 @@ const QuizTake = () => {
 
     const studentName = getStudentName();
     const sessionId = getSessionId();
+
+    const fetchQuiz = useCallback(async () => {
+        try {
+            setLoading(true);
+            setError(null);
+
+            const response = await axios.get(`${serverUrl}/quiz/${quizId}`);
+
+            setQuiz(response.data.quiz);
+            dispatch(setCurrentQuiz(response.data.quiz));
+        } catch (err) {
+            let errorMessage = 'Failed to load quiz. Please try again.';
+
+            if (axios.isAxiosError(err)) {
+                if (err.response) {
+                    errorMessage = err.response.data?.message || err.response.data?.error || 'Server error occurred';
+                } else if (err.request) {
+                    errorMessage = 'Network error. Please check your connection.';
+                }
+            }
+
+            setError(errorMessage);
+            console.error('Error fetching quiz:', err);
+        } finally {
+            setLoading(false);
+        }
+    }, [quizId]);
 
     useEffect(() => {
         if (!studentName) {
@@ -73,38 +103,11 @@ const QuizTake = () => {
         return () => {
             dispatch(clearCurrentQuiz());
         };
-    }, [quizId, studentName, navigate, quizFromStore, dispatch]);
-
-    const fetchQuiz = async () => {
-        try {
-            setLoading(true);
-            setError(null);
-            
-            const response = await axios.get(`${serverUrl}/quiz/${quizId}`);
-            
-            setQuiz(response.data.quiz);
-            dispatch(setCurrentQuiz(response.data.quiz));
-        } catch (err) {
-            let errorMessage = 'Failed to load quiz. Please try again.';
-            
-            if (axios.isAxiosError(err)) {
-                if (err.response) {
-                    errorMessage = err.response.data?.message || err.response.data?.error || 'Server error occurred';
-                } else if (err.request) {
-                    errorMessage = 'Network error. Please check your connection.';
-                }
-            }
-            
-            setError(errorMessage);
-            console.error('Error fetching quiz:', err);
-        } finally {
-            setLoading(false);
-        }
-    };
+    }, [fetchQuiz]);
 
     const handleAnswerSelect = (answer: string) => {
         if (!quiz) return;
-        
+
         const currentQuestion = quiz.questions[currentQuestionIndex];
         setAnswers(prev => ({
             ...prev,
@@ -114,7 +117,7 @@ const QuizTake = () => {
 
     const handleNext = () => {
         if (!quiz) return;
-        
+
         if (currentQuestionIndex < quiz.questions.length - 1) {
             setCurrentQuestionIndex(prev => prev + 1);
         }
@@ -156,7 +159,7 @@ const QuizTake = () => {
             setShowResults(true);
         } catch (err) {
             let errorMessage = 'Failed to submit quiz. Please try again.';
-            
+
             if (axios.isAxiosError(err)) {
                 if (err.response) {
                     errorMessage = err.response.data?.message || err.response.data?.error || 'Server error occurred';
@@ -164,7 +167,7 @@ const QuizTake = () => {
                     errorMessage = 'Network error. Please check your connection.';
                 }
             }
-            
+
             setError(errorMessage);
             console.error('Error submitting quiz:', err);
         } finally {
@@ -195,7 +198,7 @@ const QuizTake = () => {
                             <div className="w-16 h-16 border-4 border-purple-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
                         </div>
                         <h2 className="text-xl font-semibold text-gray-900">
-                            Loading quiz...
+                            Loading niraj...
                         </h2>
                     </div>
                 </div>
@@ -205,8 +208,8 @@ const QuizTake = () => {
 
     if (error || (!loading && !quiz)) {
         return (
-            <ErrorFallback 
-                error={error || 'Quiz not found'} 
+            <ErrorFallback
+                error={error || 'Quiz not found'}
                 onRetry={fetchQuiz}
             />
         );
@@ -238,45 +241,45 @@ const QuizTake = () => {
                                 </p>
                             </div>
                         </div>
-
-                        {/* Results breakdown */}
                         <div className="space-y-4 mb-8">
-                            {quiz.questions.map((question, index) => {
-                                const userAnswer = answers[question.id];
-                                const isCorrect = userAnswer === question.correctAnswer;
+                            {
+                                quiz.questions.map((question, index) => {
+                                    const userAnswer = answers[question.id];
+                                    const isCorrect = userAnswer === question.correctAnswer;
 
-                                return (
-                                    <div
-                                        key={question.id}
-                                        className={`p-4 rounded-lg border-2 ${
-                                            isCorrect
+                                    return (
+                                        <div
+                                            key={question.id}
+                                            className={`p-4 rounded-lg border-2 ${isCorrect
                                                 ? 'border-green-500 bg-green-50'
                                                 : 'border-red-500 bg-red-50'
-                                        }`}
-                                    >
-                                        <div className="flex items-start gap-3">
-                                            <span className={`text-2xl ${isCorrect ? '✅' : '❌'}`}>
-                                                {isCorrect ? '✅' : '❌'}
-                                            </span>
-                                            <div className="flex-1">
-                                                <p className="font-semibold text-gray-900 mb-2">
-                                                    {index + 1}. {question.question}
-                                                </p>
-                                                <p className="text-sm text-gray-600">
-                                                    Your answer: <span className="font-medium">{userAnswer || 'Not answered'}</span>
-                                                </p>
-                                                {!isCorrect && (
-                                                    <p className="text-sm text-green-600">
-                                                        Correct answer: <span className="font-medium">{question.correctAnswer}</span>
+                                                }`}
+                                        >
+                                            <div className="flex items-start gap-3">
+                                                <span className={`text-2xl ${isCorrect ? '✅' : '❌'}`}>
+                                                    {isCorrect ? '✅' : '❌'}
+                                                </span>
+                                                <div className="flex-1">
+                                                    <p className="font-semibold text-gray-900 mb-2">
+                                                        {index + 1}. {question.question}
                                                     </p>
-                                                )}
+                                                    <p className="text-sm text-gray-600">
+                                                        Your answer: <span className="font-medium">{userAnswer || 'Not answered'}</span>
+                                                    </p>
+                                                    {
+                                                        !isCorrect && (
+                                                            <p className="text-sm text-green-600">
+                                                                Correct answer: <span className="font-medium">{question.correctAnswer}</span>
+                                                            </p>
+                                                        )
+                                                    }
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                );
-                            })}
+                                    );
+                                })
+                            }
                         </div>
-
                         <div className="flex gap-4">
                             <button
                                 onClick={handleRetry}
@@ -304,11 +307,17 @@ const QuizTake = () => {
     const selectedAnswer = answers[currentQuestion.id];
     const progress = ((currentQuestionIndex + 1) / quiz.questions.length) * 100;
 
+    // Sort attempts by score (descending)
+    const sortedAttempts = quiz.attempts 
+        ? [...quiz.attempts].sort((a, b) => b.score - a.score).slice(0, 5)
+        : [];
+
     return (
         <>
             <div className="min-h-screen flex items-center justify-center p-5 bg-[#F2F2F2]">
-                <div className="w-full max-w-3xl bg-white rounded-xl p-12 shadow-sm">
-                    {/* Header */}
+                <div className="w-full max-w-6xl flex gap-6">
+                    {/* Main Quiz Area */}
+                    <div className="flex-1 bg-white rounded-xl p-12 shadow-sm">
                     <div className="mb-8 text-center">
                         <Badge text="InterVue" />
                         <h1 className="text-2xl font-bold text-gray-900 mt-4 mb-2">
@@ -318,8 +327,6 @@ const QuizTake = () => {
                             {quiz.topic} • {quiz.level}
                         </p>
                     </div>
-
-                    {/* Progress bar */}
                     <div className="mb-8">
                         <div className="flex justify-between text-sm text-gray-600 mb-2">
                             <span>Question {currentQuestionIndex + 1} of {quiz.questions.length}</span>
@@ -332,45 +339,41 @@ const QuizTake = () => {
                             ></div>
                         </div>
                     </div>
-
-                    {/* Question */}
                     <div className="mb-8">
                         <h2 className="text-xl font-semibold text-gray-900 mb-6">
                             {currentQuestion.question}
                         </h2>
-
-                        {/* Options */}
                         <div className="space-y-3">
-                            {currentQuestion.options.map((option, index) => (
-                                <button
-                                    key={index}
-                                    onClick={() => handleAnswerSelect(option)}
-                                    className={`w-full text-left p-4 rounded-lg border-2 transition-all ${
-                                        selectedAnswer === option
+                            {
+                                currentQuestion.options.map((option, index) => (
+                                    <button
+                                        key={index}
+                                        onClick={() => handleAnswerSelect(option)}
+                                        className={`w-full text-left p-4 rounded-lg border-2 transition-all ${selectedAnswer === option
                                             ? 'border-purple-600 bg-purple-50'
                                             : 'border-gray-200 hover:border-purple-300'
-                                    }`}
-                                >
-                                    <div className="flex items-center gap-3">
-                                        <div
-                                            className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                                                selectedAnswer === option
+                                            }`}
+                                    >
+                                        <div className="flex items-center gap-3">
+                                            <div
+                                                className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${selectedAnswer === option
                                                     ? 'border-purple-600 bg-purple-600'
                                                     : 'border-gray-300'
-                                            }`}
-                                        >
-                                            {selectedAnswer === option && (
-                                                <div className="w-2.5 h-2.5 rounded-full bg-white"></div>
-                                            )}
+                                                    }`}
+                                            >
+                                                {
+                                                    selectedAnswer === option && (
+                                                        <div className="w-2.5 h-2.5 rounded-full bg-white"></div>
+                                                    )
+                                                }
+                                            </div>
+                                            <span className="text-gray-900">{option}</span>
                                         </div>
-                                        <span className="text-gray-900">{option}</span>
-                                    </div>
-                                </button>
-                            ))}
+                                    </button>
+                                ))
+                            }
                         </div>
                     </div>
-
-                    {/* Navigation */}
                     <div className="flex justify-between items-center">
                         <button
                             onClick={handlePrevious}
@@ -379,33 +382,106 @@ const QuizTake = () => {
                         >
                             ← Previous
                         </button>
-
                         <div className="text-sm text-gray-500">
                             {Object.keys(answers).length} / {quiz.questions.length} answered
                         </div>
-
                         {
-                        currentQuestionIndex === quiz.questions.length - 1 ? (
-                            <button
-                                onClick={handleSubmit}
-                                disabled={isSubmitting || Object.keys(answers).length !== quiz.questions.length}
-                                className="bg-gradient-to-r from-[#8F64E1] to-[#1D68BD] text-white px-8 py-3 rounded-3xl text-base font-semibold hover:shadow-lg transition-all disabled:bg-gray-300 disabled:cursor-not-allowed"
-                            >
-                                {isSubmitting ? 'Submitting...' : 'Submit Quiz'}
-                            </button>
+                            currentQuestionIndex === quiz.questions.length - 1 ? (
+                                <button
+                                    onClick={handleSubmit}
+                                    disabled={isSubmitting || Object.keys(answers).length !== quiz.questions.length}
+                                    className="bg-gradient-to-r from-[#8F64E1] to-[#1D68BD] text-white px-8 py-3 rounded-3xl text-base font-semibold hover:shadow-lg transition-all disabled:bg-gray-300 disabled:cursor-not-allowed"
+                                >
+                                    {isSubmitting ? 'Submitting...' : 'Submit Quiz'}
+                                </button>
+                            ) : (
+                                <button
+                                    onClick={handleNext}
+                                    disabled={!selectedAnswer}
+                                    className="px-6 py-2 text-purple-600 hover:text-purple-700 disabled:text-gray-300 disabled:cursor-not-allowed transition-colors font-semibold"
+                                >
+                                    Next →
+                                </button>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Leaderboard Sidebar */}
+                    <div className="w-80 bg-white rounded-xl p-6 shadow-sm">
+                        <div className="flex items-center gap-2 mb-6">
+                            <svg className="w-5 h-5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                            </svg>
+                            <h3 className="text-lg font-bold text-gray-900">Leaderboard</h3>
+                        </div>
+
+                        {sortedAttempts.length === 0 ? (
+                            <div className="text-center py-8">
+                                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                    </svg>
+                                </div>
+                                <p className="text-sm text-gray-500 mb-2">No attempts yet</p>
+                                <p className="text-xs text-gray-400">Be the first to complete this quiz!</p>
+                            </div>
                         ) : (
-                            <button
-                                onClick={handleNext}
-                                disabled={!selectedAnswer}
-                                className="px-6 py-2 text-purple-600 hover:text-purple-700 disabled:text-gray-300 disabled:cursor-not-allowed transition-colors font-semibold"
-                            >
-                                Next →
-                            </button>
-                        )
-                        }
+                            <div className="space-y-3">
+                                {sortedAttempts.map((attempt, index) => (
+                                    <div
+                                        key={attempt.id}
+                                        className={`p-4 rounded-lg border-2 transition-all ${
+                                            index === 0
+                                                ? 'border-yellow-400 bg-yellow-50'
+                                                : index === 1
+                                                ? 'border-gray-300 bg-gray-50'
+                                                : index === 2
+                                                ? 'border-orange-300 bg-orange-50'
+                                                : 'border-gray-200 bg-white'
+                                        }`}
+                                    >
+                                        <div className="flex items-center gap-3">
+                                            <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${
+                                                index === 0
+                                                    ? 'bg-yellow-400 text-white'
+                                                    : index === 1
+                                                    ? 'bg-gray-400 text-white'
+                                                    : index === 2
+                                                    ? 'bg-orange-400 text-white'
+                                                    : 'bg-gray-200 text-gray-600'
+                                            }`}>
+                                                {index + 1}
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <p className="text-sm font-semibold text-gray-900 truncate">
+                                                    {attempt.studentName}
+                                                </p>
+                                                <p className="text-xs text-gray-500">
+                                                    {attempt.score.toFixed(0)}% • {Math.round((attempt.score / 100) * attempt.totalQuestions)}/{attempt.totalQuestions}
+                                                </p>
+                                            </div>
+                                            {index === 0 && (
+                                                <svg className="w-5 h-5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                                </svg>
+                                            )}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+
+                        {sortedAttempts.length > 0 && (
+                            <div className="mt-6 pt-6 border-t border-gray-200">
+                                <p className="text-xs text-gray-500 text-center">
+                                    Top {sortedAttempts.length} of {quiz.attempts?.length || 0} attempts
+                                </p>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
+            <PollNotification />
             <ChatPopup />
         </>
     );

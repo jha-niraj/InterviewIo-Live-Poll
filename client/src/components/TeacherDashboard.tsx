@@ -101,46 +101,50 @@ const TeacherDashboard = () => {
 							</button>
 						</div>
 						<div className="space-y-8">
-							{pollHistory.map((poll, index) => (
-								<div key={poll.id} className="border-b border-gray-200 pb-8 last:border-0">
-									<h3 className="text-sm font-semibold text-gray-900 mb-4">
-										Question {index + 1}
-									</h3>
-									<div className="bg-gray-700 text-white p-4 rounded-lg mb-4">
-										<p className="text-sm font-medium">{poll.question}</p>
-									</div>
-									<div className="space-y-3">
-										{poll.options.map((option: any) => {
-											const count = poll.responses.filter((r: any) => r.optionId === option.id).length;
-											const percentage = poll.responses.length > 0
-												? (count / poll.responses.length) * 100
-												: 0;
+							{
+								pollHistory.map((poll, index) => (
+									<div key={poll.id} className="border-b border-gray-200 pb-8 last:border-0">
+										<h3 className="text-sm font-semibold text-gray-900 mb-4">
+											Question {index + 1}
+										</h3>
+										<div className="bg-gray-700 text-white p-4 rounded-lg mb-4">
+											<p className="text-sm font-medium">{poll.question}</p>
+										</div>
+										<div className="space-y-3">
+											{
+												poll.options.map((option: any) => {
+													const count = poll.responses.filter((r: any) => r.optionId === option.id).length;
+													const percentage = poll.responses.length > 0
+														? (count / poll.responses.length) * 100
+														: 0;
 
-											return (
-												<div key={option.id} className="relative">
-													<div className="flex items-center justify-between mb-1">
-														<div className="flex items-center gap-2">
-															<div className="w-5 h-5 rounded-full border-2 border-purple-600 flex items-center justify-center">
-																<div className="w-2.5 h-2.5 rounded-full bg-purple-600"></div>
+													return (
+														<div key={option.id} className="relative">
+															<div className="flex items-center justify-between mb-1">
+																<div className="flex items-center gap-2">
+																	<div className="w-5 h-5 rounded-full border-2 border-purple-600 flex items-center justify-center">
+																		<div className="w-2.5 h-2.5 rounded-full bg-purple-600"></div>
+																	</div>
+																	<span className="text-sm font-medium text-gray-900">{option.text}</span>
+																</div>
+																<span className="text-sm font-semibold text-gray-900">
+																	{percentage.toFixed(0)}%
+																</span>
 															</div>
-															<span className="text-sm font-medium text-gray-900">{option.text}</span>
+															<div className="h-8 bg-gray-100 rounded-lg overflow-hidden">
+																<div
+																	className="h-full bg-purple-600 transition-all duration-500"
+																	style={{ width: `${percentage}%` }}
+																></div>
+															</div>
 														</div>
-														<span className="text-sm font-semibold text-gray-900">
-															{percentage.toFixed(0)}%
-														</span>
-													</div>
-													<div className="h-8 bg-gray-100 rounded-lg overflow-hidden">
-														<div
-															className="h-full bg-purple-600 transition-all duration-500"
-															style={{ width: `${percentage}%` }}
-														></div>
-													</div>
-												</div>
-											);
-										})}
+													);
+												})
+											}
+										</div>
 									</div>
-								</div>
-							))}
+								))
+							}
 						</div>
 					</div>
 				</div>
@@ -179,22 +183,21 @@ const TeacherDashboard = () => {
 									<div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
 								</div>
 							</div>
-
 							<div className="bg-gray-700 text-white p-4 rounded-lg mb-6">
 								<p className="text-sm font-medium">{activePoll.question}</p>
 							</div>
-
 							<div className="space-y-3 mb-8">
-								{activePoll.options.map((option: any) => (
-									<div key={option.id} className="flex items-center gap-3 p-4 border-2 border-gray-200 rounded-lg">
-										<div className="w-5 h-5 rounded-full border-2 border-purple-600 flex items-center justify-center flex-shrink-0">
-											<div className="w-2.5 h-2.5 rounded-full bg-purple-600"></div>
+								{
+									activePoll.options.map((option: any) => (
+										<div key={option.id} className="flex items-center gap-3 p-4 border-2 border-gray-200 rounded-lg">
+											<div className="w-5 h-5 rounded-full border-2 border-purple-600 flex items-center justify-center flex-shrink-0">
+												<div className="w-2.5 h-2.5 rounded-full bg-purple-600"></div>
+											</div>
+											<span className="text-sm font-medium text-gray-900">{option.text}</span>
 										</div>
-										<span className="text-sm font-medium text-gray-900">{option.text}</span>
-									</div>
-								))}
+									))
+								}
 							</div>
-
 							<div className="text-center">
 								<p className="text-sm text-gray-600 mb-4">
 									Waiting for students to answer...

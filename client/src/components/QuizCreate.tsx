@@ -7,6 +7,7 @@ import { useAppDispatch } from '../store/hooks';
 import { setCurrentQuiz } from '../store/quizSlice';
 import Badge from './Badge';
 import ChatPopup from './ChatPopup';
+import PollNotification from './PollNotification';
 import ErrorFallback from './ErrorFallback';
 
 const QuizCreate = () => {
@@ -41,7 +42,7 @@ const QuizCreate = () => {
             navigate(`/quiz/${response.data.quiz.id}`);
         } catch (err) {
             let errorMessage = 'Failed to generate quiz. Please try again.';
-            
+
             if (axios.isAxiosError(err)) {
                 if (err.response) {
                     errorMessage = err.response.data?.message || err.response.data?.error || 'Server error occurred';
@@ -49,7 +50,7 @@ const QuizCreate = () => {
                     errorMessage = 'Network error. Please check your connection.';
                 }
             }
-            
+
             setError(errorMessage);
             console.error('Error generating quiz:', err);
         } finally {
@@ -99,20 +100,19 @@ const QuizCreate = () => {
                             </label>
                             <div className="grid grid-cols-3 gap-3">
                                 {
-                                ['easy', 'medium', 'hard'].map((lvl) => (
-                                    <button
-                                        key={lvl}
-                                        onClick={() => setLevel(lvl)}
-                                        disabled={isGenerating}
-                                        className={`py-3 px-4 rounded-lg text-sm font-semibold transition-all ${
-                                            level === lvl
-                                                ? 'bg-gradient-to-r from-[#8F64E1] to-[#1D68BD] text-white'
-                                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                                        }`}
-                                    >
-                                        {lvl.charAt(0).toUpperCase() + lvl.slice(1)}
-                                    </button>
-                                ))
+                                    ['easy', 'medium', 'hard'].map((lvl) => (
+                                        <button
+                                            key={lvl}
+                                            onClick={() => setLevel(lvl)}
+                                            disabled={isGenerating}
+                                            className={`py-3 px-4 rounded-lg text-sm font-semibold transition-all ${level === lvl
+                                                    ? 'bg-gradient-to-r from-[#8F64E1] to-[#1D68BD] text-white'
+                                                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                                }`}
+                                        >
+                                            {lvl.charAt(0).toUpperCase() + lvl.slice(1)}
+                                        </button>
+                                    ))
                                 }
                             </div>
                         </div>
@@ -122,14 +122,14 @@ const QuizCreate = () => {
                             className="w-full bg-gradient-to-r from-[#8F64E1] to-[#1D68BD] text-white px-8 py-3 rounded-3xl text-base font-semibold hover:shadow-lg transition-all disabled:bg-gray-300 disabled:cursor-not-allowed"
                         >
                             {
-                            isGenerating ? (
-                                <span className="flex items-center justify-center gap-2">
-                                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                                    Generating Quiz...
-                                </span>
-                            ) : (
-                                'Generate Quiz (10 Questions)'
-                            )
+                                isGenerating ? (
+                                    <span className="flex items-center justify-center gap-2">
+                                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                        Generating Quiz...
+                                    </span>
+                                ) : (
+                                    'Generate Quiz (10 Questions)'
+                                )
                             }
                         </button>
                         <button
@@ -141,6 +141,7 @@ const QuizCreate = () => {
                     </div>
                 </div>
             </div>
+            <PollNotification />
             <ChatPopup />
         </>
     );

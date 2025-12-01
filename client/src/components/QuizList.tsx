@@ -4,6 +4,7 @@ import axios from 'axios';
 import { serverUrl } from '../config/urls';
 import Badge from './Badge';
 import ChatPopup from './ChatPopup';
+import PollNotification from './PollNotification';
 import ErrorFallback from './ErrorFallback';
 
 interface Quiz {
@@ -82,7 +83,7 @@ const QuizList = () => {
                             <div>
                                 <Badge text="Intervue" />
                                 <h1 className="text-2xl font-bold text-gray-900 mt-4">
-                                    Practice Quizzes
+                                    Practice Quiz
                                 </h1>
                                 <p className="text-sm text-gray-600 mt-1">
                                     Browse and practice quizzes created by your classmates
@@ -171,9 +172,10 @@ const QuizList = () => {
                     </div>
                 </div>
             </div>
+            <PollNotification />
             <ChatPopup />
         </>
     );
 };
 
-export default QuizList;
+export default QuizList

@@ -93,9 +93,7 @@ const TeacherCreatePoll = ({ onCreatePoll }: Props) => {
 						You'll have the ability to create and manage polls, ask questions, and monitor your students' responses in real time.
 					</p>
 				</div>
-
 				<div className="space-y-6">
-					{/* Question Input */}
 					<div>
 						<div className="flex items-center justify-between mb-2">
 							<label className="block text-sm font-semibold text-gray-900">
@@ -107,11 +105,13 @@ const TeacherCreatePoll = ({ onCreatePoll }: Props) => {
 									onChange={(e) => setTimeLimit(Number(e.target.value))}
 									className="text-xs border border-gray-300 rounded px-2 py-1 focus:border-purple-600 focus:outline-none"
 								>
-									{timeOptions.map((option) => (
-										<option key={option.value} value={option.value}>
-											{option.label}
-										</option>
-									))}
+									{
+										timeOptions.map((option) => (
+											<option key={option.value} value={option.value}>
+												{option.label}
+											</option>
+										))
+									}
 								</select>
 								<span className="text-red-500">⏱️</span>
 							</div>
@@ -128,15 +128,15 @@ const TeacherCreatePoll = ({ onCreatePoll }: Props) => {
 							<span className="text-xs text-gray-500">
 								{questionLength}/140 characters
 							</span>
-							{questionLength > 120 && (
-								<span className="text-xs text-orange-500">
-									{140 - questionLength} characters remaining
-								</span>
-							)}
+							{
+								questionLength > 120 && (
+									<span className="text-xs text-orange-500">
+										{140 - questionLength} characters remaining
+									</span>
+								)
+							}
 						</div>
 					</div>
-
-					{/* Options */}
 					<div>
 						<div className="flex items-center justify-between mb-4">
 							<label className="block text-sm font-semibold text-gray-900">
@@ -146,74 +146,76 @@ const TeacherCreatePoll = ({ onCreatePoll }: Props) => {
 								Correct Answer?
 							</label>
 						</div>
-
 						<div className="space-y-3">
-							{options.map((option, index) => (
-								<div key={index} className="flex items-center gap-3">
-									<div className="w-5 h-5 rounded-full border-2 border-purple-600 flex items-center justify-center flex-shrink-0">
-										<div className="w-2.5 h-2.5 rounded-full bg-purple-600"></div>
+							{
+								options.map((option, index) => (
+									<div key={index} className="flex items-center gap-3">
+										<div className="w-5 h-5 rounded-full border-2 border-purple-600 flex items-center justify-center flex-shrink-0">
+											<div className="w-2.5 h-2.5 rounded-full bg-purple-600"></div>
+										</div>
+										<input
+											type="text"
+											placeholder={`Option ${index + 1}`}
+											value={option}
+											onChange={(e) => handleOptionChange(index, e.target.value)}
+											className="flex-1 px-4 py-2.5 border-2 border-gray-200 rounded-lg text-sm focus:border-purple-600 focus:outline-none transition-colors"
+										/>
+										<div className="flex items-center gap-2">
+											<label className="flex items-center gap-1 cursor-pointer">
+												<input
+													type="radio"
+													name="correctAnswer"
+													value={option}
+													checked={correctAnswer === option}
+													onChange={(e) => setCorrectAnswer(e.target.value)}
+													disabled={!option.trim()}
+													className="w-4 h-4 text-purple-600"
+												/>
+												<span className="text-xs text-gray-600">Yes</span>
+											</label>
+											<label className="flex items-center gap-1 cursor-pointer">
+												<input
+													type="radio"
+													name={`not-correct-${index}`}
+													checked={correctAnswer !== option}
+													onChange={() => { }}
+													disabled={!option.trim()}
+													className="w-4 h-4 text-gray-400"
+												/>
+												<span className="text-xs text-gray-600">No</span>
+											</label>
+											{
+												options.length > 2 && (
+													<button
+														onClick={() => handleRemoveOption(index)}
+														className="text-red-500 hover:text-red-700 text-sm ml-2"
+														title="Remove option"
+													>
+														✕
+													</button>
+												)
+											}
+										</div>
 									</div>
-									<input
-										type="text"
-										placeholder={`Option ${index + 1}`}
-										value={option}
-										onChange={(e) => handleOptionChange(index, e.target.value)}
-										className="flex-1 px-4 py-2.5 border-2 border-gray-200 rounded-lg text-sm focus:border-purple-600 focus:outline-none transition-colors"
-									/>
-									<div className="flex items-center gap-2">
-										<label className="flex items-center gap-1 cursor-pointer">
-											<input
-												type="radio"
-												name="correctAnswer"
-												value={option}
-												checked={correctAnswer === option}
-												onChange={(e) => setCorrectAnswer(e.target.value)}
-												disabled={!option.trim()}
-												className="w-4 h-4 text-purple-600"
-											/>
-											<span className="text-xs text-gray-600">Yes</span>
-										</label>
-										<label className="flex items-center gap-1 cursor-pointer">
-											<input
-												type="radio"
-												name={`not-correct-${index}`}
-												checked={correctAnswer !== option}
-												onChange={() => {}}
-												disabled={!option.trim()}
-												className="w-4 h-4 text-gray-400"
-											/>
-											<span className="text-xs text-gray-600">No</span>
-										</label>
-										{options.length > 2 && (
-											<button
-												onClick={() => handleRemoveOption(index)}
-												className="text-red-500 hover:text-red-700 text-sm ml-2"
-												title="Remove option"
-											>
-												✕
-											</button>
-										)}
-									</div>
-								</div>
-							))}
+								))
+							}
 						</div>
-
 						<div className="mt-4 flex items-center justify-between">
-							{options.length < 6 && (
-								<button
-									onClick={handleAddOption}
-									className="text-purple-600 text-sm font-semibold hover:text-purple-700 transition-colors"
-								>
-									+ Add More Option
-								</button>
-							)}
+							{
+								options.length < 6 && (
+									<button
+										onClick={handleAddOption}
+										className="text-purple-600 text-sm font-semibold hover:text-purple-700 transition-colors"
+									>
+										+ Add More Option
+									</button>
+								)
+							}
 							<span className="text-xs text-gray-500">
 								{options.filter(opt => opt.trim()).length} of {options.length} options filled
 							</span>
 						</div>
 					</div>
-
-					{/* Submit Button */}
 					<div className="pt-4">
 						<button
 							onClick={handleSubmit}
@@ -222,16 +224,17 @@ const TeacherCreatePoll = ({ onCreatePoll }: Props) => {
 						>
 							Ask Question
 						</button>
-
-						{!canSubmit && (
-							<div className="mt-2 text-center">
-								<span className="text-xs text-gray-500">
-									{!question.trim() && 'Enter a question • '}
-									{filledOptions.length < 2 && 'Add at least 2 options • '}
-									{!correctAnswer && 'Select correct answer'}
-								</span>
-							</div>
-						)}
+						{
+							!canSubmit && (
+								<div className="mt-2 text-center">
+									<span className="text-xs text-gray-500">
+										{!question.trim() && 'Enter a question • '}
+										{filledOptions.length < 2 && 'Add at least 2 options • '}
+										{!correctAnswer && 'Select correct answer'}
+									</span>
+								</div>
+							)
+						}
 					</div>
 				</div>
 			</div>

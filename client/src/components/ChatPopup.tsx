@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
-import { getSocket } from '../utils/socket';
-import { getStudentName, getRole } from '../utils/sessionStorage';
+import { getSocket, initSocket } from '../utils/socket';
+import { getStudentName, getRole, getSessionId } from '../utils/sessionStorage';
 
 interface Message {
     id: string;
@@ -29,14 +29,33 @@ const ChatPopup = () => {
     const currentUserName = role === 'teacher' ? 'Teacher' : getStudentName() || 'Student';
 
     useEffect(() => {
-        const socket = getSocket();
-        if (!socket) return;
+        // Initialize socket if not already initialized
+        let socket = getSocket();
+        if (!socket) {
+            console.log('🔌 Initializing socket in ChatPopup');
+            socket = initSocket();
+            
+            // If student, join the session
+            if (role === 'student') {
+                const studentName = getStudentName();
+                const sessionId = getSessionId();
+                console.log('👨‍🎓 Student joining chat:', { studentName, sessionId });
+                socket.emit('student:join', { name: studentName, sessionId });
+            } else if (role === 'teacher') {
+                console.log('👨‍🏫 Teacher connecting to chat');
+                socket.emit('teacher:connect');
+            }
+        }
+
+        console.log('📡 Setting up chat listeners');
 
         socket.on('chat:message', (message: Message) => {
+            console.log('📨 Received chat message:', message);
             setMessages((prev) => [...prev, message]);
         });
 
         socket.on('participants:update', (data: Participant[]) => {
+            console.log('👥 Participants updated:', data.length);
             setParticipants(data);
         });
 
@@ -44,7 +63,7 @@ const ChatPopup = () => {
             socket.off('chat:message');
             socket.off('participants:update');
         };
-    }, []);
+    }, [role]);
 
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -54,6 +73,10 @@ const ChatPopup = () => {
         if (!newMessage.trim()) return;
 
         const socket = getSocket();
+        if (!socket) {
+            console.error('❌ No socket connection to send message');
+            return;
+        }
 
         const message: Message = {
             id: Date.now().toString(),
@@ -63,7 +86,8 @@ const ChatPopup = () => {
             role: role || 'student',
         };
 
-        socket?.emit('chat:message', message);
+        console.log('📤 Sending message:', message);
+        socket.emit('chat:message', message);
         setNewMessage('');
     };
 
@@ -75,7 +99,13 @@ const ChatPopup = () => {
     };
 
     const isMyMessage = (message: Message) => {
-        return message.sender === currentUserName;
+        const isMine = message.sender === currentUserName;
+        console.log('Checking message:', { 
+            messageSender: message.sender, 
+            currentUser: currentUserName, 
+            isMine 
+        });
+        return isMine;
     };
 
     const handleKickStudent = (studentId: string) => {

@@ -37,7 +37,7 @@ This guide shows all the screens in the application and when they appear.
     │  Screen           │         │  (Teacher View)   │
     └─────────┬─────────┘         └─────────┬─────────┘
               │                               │
-              │  ◄────── Socket.io ──────────┤
+              │  ◄──────  Socket.io ──────────┤
               │      (poll:update)            │
               ▼                               ▼
     ┌───────────────────┐         ┌───────────────────┐

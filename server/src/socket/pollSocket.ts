@@ -256,6 +256,21 @@ export function setupSocketHandlers(io: Server) {
             }
         });
 
+        // Chat message handling
+        socket.on('chat:message', (message: any) => {
+            try {
+                console.log('💬 Chat message:', message.sender, '-', message.text);
+
+                // Broadcast message to all connected clients
+                io.emit('chat:message', {
+                    ...message,
+                    timestamp: new Date(),
+                });
+            } catch (error) {
+                console.error('❌ Error in chat:message:', error);
+            }
+        });
+
         // Handle disconnect
         socket.on('disconnect', () => {
             console.log('Client disconnected:', socket.id);

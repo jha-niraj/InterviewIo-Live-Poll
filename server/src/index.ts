@@ -11,23 +11,23 @@ const httpServer = createServer(app);
 
 // Socket.io setup with CORS
 const io = new Server(httpServer, {
-  cors: {
-    origin: 'http://localhost:5173',
-    methods: ['GET', 'POST'],
-    credentials: true,
-  },
+	cors: {
+		origin: 'http://localhost:5173',
+		methods: ['GET', 'POST'],
+		credentials: true,
+	},
 });
 
 // Middleware
 app.use(cors({
-  origin: 'http://localhost:5173',
-  credentials: true,
+	origin: 'http://localhost:5173',
+	credentials: true,
 }));
 app.use(express.json());
 
 // Health check
 app.get('/', (req, res) => {
-  res.json({ message: 'Live Polling System API' });
+	res.json({ message: 'Live Polling System API' });
 });
 
 // API Routes
@@ -41,8 +41,8 @@ setupSocketHandlers(io);
 const PORT = process.env.PORT || 3000;
 
 httpServer.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-  console.log(`Socket.io server ready`);
+	console.log(`Server running on port ${PORT}`);
+	console.log(`Socket.io server ready`);
 });
 
 export { io };

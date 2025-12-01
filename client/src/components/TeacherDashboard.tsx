@@ -85,7 +85,6 @@ const TeacherDashboard = () => {
 								← Back to Dashboard
 							</button>
 						</div>
-
 						<div className="space-y-8">
 							{pollHistory.map((poll, index) => (
 								<div key={poll.id} className="border-b border-gray-200 pb-8 last:border-0">

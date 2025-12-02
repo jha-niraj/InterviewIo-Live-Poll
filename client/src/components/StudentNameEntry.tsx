@@ -23,17 +23,19 @@ const StudentNameEntry = () => {
 
 	return (
 		<div className="min-h-screen flex items-center justify-center p-5 bg-[#F2F2F2]">
-			<div className="w-full max-w-2xl bg-white rounded-xl p-16 shadow-sm">
+			<div className="w-full max-w-2xl rounded-xl p-16">
 				<div className="text-center">
 					<div className="mb-5">
-						<Badge text="InterVue" />
+						<Badge text="InterVue Poll" />
 					</div>
-					<h1 className="text-3xl font-bold text-gray-900 mb-3">Let's Get Started</h1>
-					<p className="text-sm text-gray-600 mb-10 leading-relaxed">
-						If you're a student, you'll be able to submit your answers, participate in live polls, and view how your responses compare with your classmates.
+					<h1 className="text-3xl font-medium text-gray-900 mb-3">Let’s
+						<span className='font-bold'> Get Started</span>
+					</h1>
+					<p className="text-sm font-medium text-gray-600 mb-10 leading-relaxed">
+						If you're a student, you'll be able to <span className='font-bold'>submit your answers</span>, participate in live polls, and view how your responses compare with your classmates.
 					</p>
 					<div className="mb-8 text-left">
-						<label htmlFor="name" className="block text-sm font-semibold text-gray-900 mb-2">
+						<label htmlFor="name" className="block text-sm font-medium text-gray-900 mb-2">
 							Enter your Name
 						</label>
 						<input
@@ -48,7 +50,7 @@ const StudentNameEntry = () => {
 						/>
 					</div>
 					<button
-						className="bg-gradient-to-r from-[#8F64E1] to-[#1D68BD] text-white px-8 py-3 rounded-3xl text-base font-semibold hover:shadow-lg transition-all disabled:bg-gray-300 disabled:cursor-not-allowed w-full"
+						className="w-fit bg-gradient-to-r from-[#8F64E1] to-[#1D68BD] text-white px-8 py-3 rounded-3xl text-base font-semibold hover:shadow-lg transition-all disabled:bg-gray-300 disabled:cursor-not-allowed w-full"
 						onClick={handleContinue}
 						disabled={!name.trim()}
 					>

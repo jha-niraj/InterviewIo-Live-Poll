@@ -23,7 +23,7 @@ const RoleSelection = () => {
 			<div className="w-full max-w-4xl rounded-xl p-16">
 				<div className="flex flex-col items-center justify-center">
 					<div className="mb-5">
-						<Badge text="Intervue" />
+						<Badge text="Intervue Poll" />
 					</div>
 					<h1 className="text-3xl font-medium text-gray-900 mb-3">
 						Welcome to the <span className='font-bold'>Live Polling System</span>
@@ -34,7 +34,7 @@ const RoleSelection = () => {
 					<div className="grid grid-cols-2 gap-5 mb-10">
 						<div
 							className={`border-4 rounded-xl p-8 cursor-pointer transition-all text-left ${selectedRole === 'student'
-								? 'border-[#1d68BD] bg-purple-50 shadow-[0_0_0_3px_rgba(124,58,237,0.1)]'
+								? 'border-[#1d68BD] bg-purple-50'
 								: 'border-gray-200 hover:border-purple-600 hover:bg-purple-50/30'
 								}`}
 							onClick={() => setSelectedRole('student')}
@@ -46,7 +46,7 @@ const RoleSelection = () => {
 						</div>
 						<div
 							className={`border-4 rounded-xl p-8 cursor-pointer transition-all text-left ${selectedRole === 'teacher'
-								? 'border-[#1d68BD] bg-purple-50 shadow-[0_0_0_3px_rgba(124,58,237,0.1)]'
+								? 'border-[#1d68BD] bg-purple-50'
 								: 'border-gray-200 hover:border-purple-600 hover:bg-purple-50/30'
 								}`}
 							onClick={() => setSelectedRole('teacher')}

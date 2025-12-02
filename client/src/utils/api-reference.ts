@@ -2,7 +2,7 @@
  * API REFERENCE FILE
  * 
  * This file is kept for reference purposes.
- * We're using axios directly in components for simplicity and interview clarity.
+ * We're using axios directly in components for simplicity and Intervue clarity.
  * 
  * This approach with centralized axios instance and interceptors is more scalable
  * for production apps, but for this project we keep it simple.

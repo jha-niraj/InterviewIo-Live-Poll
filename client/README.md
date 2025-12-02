@@ -1,6 +1,6 @@
-# 🎨 InterviewIO Client
+# 🎨 Intervue Client
 
-Frontend application for the InterviewIO Live Polling & Quiz System. Built with React 19, TypeScript, Redux Toolkit, and Tailwind CSS.
+Frontend application for the Intervue Live Polling & Quiz System. Built with React 19, TypeScript, Redux Toolkit, and Tailwind CSS.
 
 ---
 

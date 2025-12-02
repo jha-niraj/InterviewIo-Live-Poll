@@ -6,7 +6,7 @@ interface BadgeProps {
 
 const Badge = ({ text = "# InterVue" }: BadgeProps) => {
     return (
-        <div className="inline-flex items-center gap-2 bg-gradient-to-r from-[#8F64E1] to-[#1D68BD] px-4 py-1.5 rounded-full">
+        <div className="inline-flex items-center gap-2 bg-gradient-to-r from-[#7565D9] to-[#4D0ACD] px-4 py-1.5 rounded-full">
             <img
                 src={mainiconsvg}
                 alt="InterVue Logo"

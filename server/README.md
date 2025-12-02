@@ -1,6 +1,6 @@
-# 🖥️ InterviewIO Server
+# 🖥️ Intervue Server
 
-Backend server for the InterviewIO Live Polling & Quiz System. Built with Express, Socket.io, Prisma, and PostgreSQL.
+Backend server for the Intervue Live Polling & Quiz System. Built with Express, Socket.io, Prisma, and PostgreSQL.
 
 ---
 
@@ -24,7 +24,7 @@ npm install
 cp .env.example .env
 
 # Edit .env with your credentials
-DATABASE_URL="postgresql://user:password@localhost:5432/interviewio"
+DATABASE_URL="postgresql://user:password@localhost:5432/Intervue"
 OPENAI_API_KEY="your-openai-api-key"
 
 # Generate Prisma client

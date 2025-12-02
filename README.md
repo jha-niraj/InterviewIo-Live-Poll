@@ -1,4 +1,4 @@
-# 🎯 InterviewIO - Live Polling & Quiz System
+# 🎯 Intervue - Live Polling & Quiz System
 
 A real-time polling and quiz application for teachers and students with live results, chat functionality, AI-powered quiz generation, and comprehensive analytics.
 
@@ -9,7 +9,7 @@ A real-time polling and quiz application for teachers and students with live res
 ![Realtime](https://img.shields.io/badge/realtime-Socket.io-black)
 
 🌐 **Live Demo**: [poll.nirajjha.xyz](https://poll.nirajjha.xyz)  
-📦 **GitHub**: [InterviewIO-Live-Poll](https://github.com/jha-niraj/InterviewIo-Live-Poll)
+📦 **GitHub**: [Intervue-Live-Poll](https://github.com/jha-niraj/Intervue-Live-Poll)
 
 ---
 
@@ -57,8 +57,8 @@ A real-time polling and quiz application for teachers and students with live res
 
 ```bash
 # Clone repository
-git clone https://github.com/jha-niraj/InterviewIo-Live-Poll.git
-cd InterviewIo-Live-Poll
+git clone https://github.com/jha-niraj/Intervue-Live-Poll.git
+cd Intervue-Live-Poll
 
 # Setup server (see server/README.md for details)
 cd server
@@ -253,7 +253,7 @@ MIT License - Free to use for learning purposes
 
 ## 🙏 Acknowledgments
 
-Built with ❤️ by Niraj Jha for InterviewIO Assignment
+Built with ❤️ by Niraj Jha for Intervue Assignment
 
 **Technologies**: React, Express, Socket.io, PostgreSQL, Prisma, OpenAI, Redux, Tailwind CSS
 

@@ -7,7 +7,7 @@
 4. [Server-Side Implementation](#server-side-implementation)
 5. [Client-Side Implementation](#client-side-implementation)
 6. [Complete Message Flow](#complete-message-flow)
-7. [Interview Questions & Answers](#interview-questions--answers)
+7. [Intervue Questions & Answers](#Intervue-questions--answers)
 
 ---
 
@@ -1061,7 +1061,7 @@ export default ChatPopup;
 
 ---
 
-## 🎯 Interview Questions & Answers
+## 🎯 Intervue Questions & Answers
 
 ### Q1: What is the difference between HTTP and WebSocket?
 
@@ -1713,7 +1713,7 @@ socket.on('participant:left', (participantId) => {
 
 ---
 
-## 🎓 Key Takeaways for Interviews
+## 🎓 Key Takeaways for Intervues
 
 1. **WebSocket vs HTTP:**
    - WebSocket = persistent, bidirectional, real-time

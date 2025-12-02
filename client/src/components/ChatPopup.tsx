@@ -34,7 +34,7 @@ const ChatPopup = () => {
         if (!socket) {
             console.log('🔌 Initializing socket in ChatPopup');
             socket = initSocket();
-            
+
             // If student, join the session
             if (role === 'student') {
                 const studentName = getStudentName();
@@ -100,10 +100,10 @@ const ChatPopup = () => {
 
     const isMyMessage = (message: Message) => {
         const isMine = message.sender === currentUserName;
-        console.log('Checking message:', { 
-            messageSender: message.sender, 
-            currentUser: currentUserName, 
-            isMine 
+        console.log('Checking message:', {
+            messageSender: message.sender,
+            currentUser: currentUserName,
+            isMine
         });
         return isMine;
     };
@@ -131,22 +131,13 @@ const ChatPopup = () => {
             {
                 isOpen && (
                     <div className="fixed bottom-24 right-6 w-96 h-[500px] bg-white rounded-xl shadow-2xl flex flex-col z-50 border border-gray-200">
-                        <div className="bg-gradient-to-r from-[#8F64E1] to-[#1D68BD] text-white rounded-t-xl">
-                            <div className="flex items-center justify-between p-4 pb-0">
-                                <h3 className="font-semibold">Communication</h3>
-                                <button
-                                    onClick={() => setIsOpen(false)}
-                                    className="text-white hover:text-gray-200 text-lg"
-                                >
-                                    ✕
-                                </button>
-                            </div>
+                        <div className="bg-[#F2F2F2] text-white rounded-t-xl border-b">
                             <div className="flex border-b border-white/20">
                                 <button
                                     onClick={() => setActiveTab('chat')}
                                     className={`flex-1 py-3 px-4 text-sm font-medium transition-colors ${activeTab === 'chat'
-                                        ? 'text-white border-b-2 border-white'
-                                        : 'text-white/70 hover:text-white'
+                                        ? 'text-black border-b-4 border-[#8F64E1]'
+                                        : 'text-black/70 hover:text-gray-400'
                                         }`}
                                 >
                                     Chat
@@ -154,8 +145,8 @@ const ChatPopup = () => {
                                 <button
                                     onClick={() => setActiveTab('participants')}
                                     className={`flex-1 py-3 px-4 text-sm font-medium transition-colors ${activeTab === 'participants'
-                                        ? 'text-white border-b-2 border-white'
-                                        : 'text-white/70 hover:text-white'
+                                        ? 'text-black border-b-4 border-[#8F64E1]'
+                                        : 'text-black/70 hover:text-gray-400'
                                         }`}
                                 >
                                     Participants ({participants.length})
@@ -166,7 +157,7 @@ const ChatPopup = () => {
                             {
                                 activeTab === 'chat' ? (
                                     <>
-                                        <div className="flex-1 overflow-y-auto p-4 space-y-3 h-[340px]">
+                                        <div className="flex-1 overflow-y-auto p-4 space-y-3 h-[380px]">
                                             {
                                                 messages.length === 0 ? (
                                                     <div className="text-center text-gray-500 text-sm mt-8">
@@ -181,7 +172,7 @@ const ChatPopup = () => {
                                                         >
                                                             <div
                                                                 className={`max-w-[75%] rounded-lg p-3 ${isMyMessage(message)
-                                                                    ? 'bg-gradient-to-r from-[#8F64E1] to-[#1D68BD] text-white'
+                                                                    ? 'bg-[#8F64E1] text-white'
                                                                     : message.role === 'teacher'
                                                                         ? 'bg-blue-100 text-blue-900 border border-blue-200'
                                                                         : 'bg-gray-100 text-gray-900'
@@ -234,15 +225,9 @@ const ChatPopup = () => {
                                                             className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
                                                         >
                                                             <div className="flex items-center gap-3">
-                                                                <div className="w-8 h-8 bg-gradient-to-r from-[#8F64E1] to-[#1D68BD] rounded-full flex items-center justify-center text-white text-sm font-semibold">
-                                                                    {participant.name.charAt(0).toUpperCase()}
-                                                                </div>
                                                                 <div>
                                                                     <p className="text-sm font-medium text-gray-900">
                                                                         {participant.name}
-                                                                    </p>
-                                                                    <p className="text-xs text-gray-500">
-                                                                        {participant.hasAnswered ? 'Answered' : 'Waiting'}
                                                                     </p>
                                                                 </div>
                                                             </div>
@@ -253,15 +238,17 @@ const ChatPopup = () => {
                                                                     )
                                                                 }
                                                                 <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                                                                {role === 'teacher' && (
-                                                                    <button
-                                                                        onClick={() => handleKickStudent(participant.id)}
-                                                                        className="ml-2 text-red-500 hover:text-red-700 text-xs font-semibold"
-                                                                        title="Kick student"
-                                                                    >
-                                                                        Kick
-                                                                    </button>
-                                                                )}
+                                                                {
+                                                                    role === 'teacher' && (
+                                                                        <button
+                                                                            onClick={() => handleKickStudent(participant.id)}
+                                                                            className="ml-2 underline text-[#1D68BD] hover:text-red-700 text-xs font-semibold"
+                                                                            title="Kick student"
+                                                                        >
+                                                                            Kick out
+                                                                        </button>
+                                                                    )
+                                                                }
                                                             </div>
                                                         </div>
                                                     ))

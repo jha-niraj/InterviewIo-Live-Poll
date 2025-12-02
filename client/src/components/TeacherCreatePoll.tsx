@@ -15,11 +15,12 @@ const TeacherCreatePoll = ({ onCreatePoll }: Props) => {
 	const timeOptions = [
 		{ value: 30, label: '30 seconds' },
 		{ value: 45, label: '45 seconds' },
-		{ value: 60, label: '1 minute' },
-		{ value: 90, label: '1.5 minutes' },
-		{ value: 120, label: '2 minutes' },
+		{ value: 60, label: '60 seconds' },
+		{ value: 90, label: '90 seconds' },
+		{ value: 120, label: '120 seconds' },
 		{ value: 180, label: '3 minutes' },
 		{ value: 300, label: '5 minutes' },
+		{ value: 600, label: '10 minutes' }
 	];
 
 	const handleAddOption = () => {
@@ -82,13 +83,13 @@ const TeacherCreatePoll = ({ onCreatePoll }: Props) => {
 	const questionLength = question.length;
 
 	return (
-		<div className="min-h-screen flex items-center justify-center p-5 bg-[#F2F2F2]">
-			<div className="w-full max-w-3xl bg-white rounded-xl p-12 shadow-sm">
-				<div className="mb-8 text-center">
+		<div className="min-h-screen flex items-center justify-center p-5 bg-white">
+			<div className="w-full max-w-3xl rounded-xl p-12">
+				<div className="mb-8 text-left">
 					<div className="mb-5">
-						<Badge text="InterVue" />
+						<Badge text="InterVue Poll" />
 					</div>
-					<h1 className="text-3xl font-bold text-gray-900 mb-3">Let's Get Started</h1>
+					<h1 className="text-3xl font-medium text-gray-900 mb-3">Let's <span className="font-bold">Get Started</span></h1>
 					<p className="text-sm text-gray-600 leading-relaxed max-w-2xl mx-auto">
 						You'll have the ability to create and manage polls, ask questions, and monitor your students' responses in real time.
 					</p>
@@ -99,11 +100,13 @@ const TeacherCreatePoll = ({ onCreatePoll }: Props) => {
 							<label className="block text-sm font-semibold text-gray-900">
 								Enter your question
 							</label>
-							<div className="flex items-center gap-2">
+							<div className="relative w-fit bg-[#F2F2F2]">
 								<select
 									value={timeLimit}
 									onChange={(e) => setTimeLimit(Number(e.target.value))}
-									className="text-xs border border-gray-300 rounded px-2 py-1 focus:border-purple-600 focus:outline-none"
+									className="
+										appearance-none text-sm bg-gray-100 border rounded-lg cursor-pointer border-gray-300
+										px-3 py-1.5 pr-7 focus:outline-blue-600"
 								>
 									{
 										timeOptions.map((option) => (
@@ -113,21 +116,26 @@ const TeacherCreatePoll = ({ onCreatePoll }: Props) => {
 										))
 									}
 								</select>
-								<span className="text-red-500">⏱️</span>
+								<span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-purple-600 text-lg">
+									▼
+								</span>
 							</div>
 						</div>
-						<input
-							type="text"
-							placeholder="Which planet is known as the Red Planet?"
-							value={question}
-							onChange={(e) => setQuestion(e.target.value)}
-							maxLength={140}
-							className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg text-sm focus:border-purple-600 focus:outline-none transition-colors"
-						/>
-						<div className="mt-2 flex justify-between items-center">
-							<span className="text-xs text-gray-500">
-								{questionLength}/140 characters
+						<div className="relative">
+							<textarea
+								placeholder="Which planet is known as the Red Planet?"
+								value={question}
+								onChange={(e) => setQuestion(e.target.value)}
+								rows={5}
+								cols={50}
+								maxLength={100}
+								className="w-full px-4 py-3 bg-[#F2F2F2] border-2 border-gray-200 rounded-lg text-sm focus:border-purple-600 focus:outline-none transition-colors"
+							/>
+							<span className="absolute bottom-4 right-3 text-xs text-gray-500">
+								{questionLength}/100
 							</span>
+						</div>
+						<div className="mt-2 flex justify-between items-center">
 							{
 								questionLength > 120 && (
 									<span className="text-xs text-orange-500">
@@ -137,7 +145,7 @@ const TeacherCreatePoll = ({ onCreatePoll }: Props) => {
 							}
 						</div>
 					</div>
-					<div>
+					<div className="border-b pb-5">
 						<div className="flex items-center justify-between mb-4">
 							<label className="block text-sm font-semibold text-gray-900">
 								Answer Options
@@ -150,15 +158,15 @@ const TeacherCreatePoll = ({ onCreatePoll }: Props) => {
 							{
 								options.map((option, index) => (
 									<div key={index} className="flex items-center gap-3">
-										<div className="w-5 h-5 rounded-full border-2 border-purple-600 flex items-center justify-center flex-shrink-0">
-											<div className="w-2.5 h-2.5 rounded-full bg-purple-600"></div>
+										<div className="w-7 h-7 rounded-full bg-gradient-to-r from-[#8F64E1] to-[#4E377B] flex items-center justify-center text-white text-sm flex-shrink-0">
+											{index + 1}
 										</div>
 										<input
 											type="text"
 											placeholder={`Option ${index + 1}`}
 											value={option}
 											onChange={(e) => handleOptionChange(index, e.target.value)}
-											className="flex-1 px-4 py-2.5 border-2 border-gray-200 rounded-lg text-sm focus:border-purple-600 focus:outline-none transition-colors"
+											className="bg-[#F2F2F2] max-w-[507px] flex-1 px-4 py-2.5 border-2 border-gray-200 rounded-lg text-sm focus:border-purple-600 focus:outline-none transition-colors"
 										/>
 										<div className="flex items-center gap-2">
 											<label className="flex items-center gap-1 cursor-pointer">
@@ -205,7 +213,7 @@ const TeacherCreatePoll = ({ onCreatePoll }: Props) => {
 								options.length < 6 && (
 									<button
 										onClick={handleAddOption}
-										className="text-purple-600 text-sm font-semibold hover:text-purple-700 transition-colors"
+										className="text-[#7C57C2] text-sm font-small border-2 border-[#7451B6] rounded-xl p-2 hover:text-purple-700 transition-colors"
 									>
 										+ Add More Option
 									</button>
@@ -216,17 +224,10 @@ const TeacherCreatePoll = ({ onCreatePoll }: Props) => {
 							</span>
 						</div>
 					</div>
-					<div className="pt-4">
-						<button
-							onClick={handleSubmit}
-							disabled={!canSubmit}
-							className="w-full bg-gradient-to-r from-[#8F64E1] to-[#1D68BD] text-white px-8 py-3 rounded-3xl text-base font-semibold hover:shadow-lg transition-all disabled:bg-gray-300 disabled:cursor-not-allowed disabled:shadow-none"
-						>
-							Ask Question
-						</button>
+					<div className="flex items-center justify-between">
 						{
 							!canSubmit && (
-								<div className="mt-2 text-center">
+								<div className="text-center">
 									<span className="text-xs text-gray-500">
 										{!question.trim() && 'Enter a question • '}
 										{filledOptions.length < 2 && 'Add at least 2 options • '}
@@ -235,6 +236,13 @@ const TeacherCreatePoll = ({ onCreatePoll }: Props) => {
 								</div>
 							)
 						}
+						<button
+							onClick={handleSubmit}
+							disabled={!canSubmit}
+							className="text-right w-fit bg-gradient-to-r from-[#8F64E1] to-[#1D68BD] text-white px-8 py-2 rounded-3xl text-base font-semibold hover:shadow-lg transition-all disabled:bg-gray-300 disabled:cursor-not-allowed disabled:shadow-none"
+						>
+							Ask Question
+						</button>
 					</div>
 				</div>
 			</div>

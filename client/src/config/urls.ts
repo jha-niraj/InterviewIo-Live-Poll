@@ -1,7 +1,7 @@
 const isDevelopment = import.meta.env.DEV;
 
 const DEV_SERVER_URL = 'http://localhost:3000';
-const PROD_SERVER_URL = 'https://Intervue-live-poll.onrender.com';
+const PROD_SERVER_URL = 'https://interviewio-live-poll.onrender.com';
 
 export const SERVER_URL = isDevelopment ? DEV_SERVER_URL : PROD_SERVER_URL;
 

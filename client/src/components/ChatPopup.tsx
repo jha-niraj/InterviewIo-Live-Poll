@@ -31,39 +31,55 @@ const ChatPopup = () => {
     useEffect(() => {
         // Initialize socket if not already initialized
         let socket = getSocket();
+        const needsInit = !socket;
+        
         if (!socket) {
             console.log('🔌 Initializing socket in ChatPopup');
             socket = initSocket();
-
-            // If student, join the session
-            if (role === 'student') {
-                const studentName = getStudentName();
-                const sessionId = getSessionId();
-                console.log('👨‍🎓 Student joining chat:', { studentName, sessionId });
-                socket.emit('student:join', { name: studentName, sessionId });
-            } else if (role === 'teacher') {
-                console.log('👨‍🏫 Teacher connecting to chat');
-                socket.emit('teacher:connect');
-            }
         }
 
-        console.log('📡 Setting up chat listeners');
+        // Only join if we just initialized the socket
+        if (needsInit) {
+            // Small delay to ensure socket is connected
+            setTimeout(() => {
+                if (role === 'student') {
+                    const studentName = getStudentName();
+                    const sessionId = getSessionId();
+                    console.log('👨‍🎓 Student joining chat:', { studentName, sessionId });
+                    socket?.emit('student:join', { name: studentName, sessionId });
+                } else if (role === 'teacher') {
+                    console.log('👨‍🏫 Teacher connecting to chat');
+                    socket?.emit('teacher:connect');
+                }
+            }, 100);
+        }
 
-        socket.on('chat:message', (message: Message) => {
+        console.log('📡 Setting up chat listeners for:', currentUserName);
+
+        const handleChatMessage = (message: Message) => {
             console.log('📨 Received chat message:', message);
-            setMessages((prev) => [...prev, message]);
-        });
+            setMessages((prev) => {
+                // Prevent duplicates
+                if (prev.some(m => m.id === message.id)) {
+                    return prev;
+                }
+                return [...prev, message];
+            });
+        };
 
-        socket.on('participants:update', (data: Participant[]) => {
+        const handleParticipantsUpdate = (data: Participant[]) => {
             console.log('👥 Participants updated:', data.length);
             setParticipants(data);
-        });
+        };
+
+        socket.on('chat:message', handleChatMessage);
+        socket.on('participants:update', handleParticipantsUpdate);
 
         return () => {
-            socket.off('chat:message');
-            socket.off('participants:update');
+            socket?.off('chat:message', handleChatMessage);
+            socket?.off('participants:update', handleParticipantsUpdate);
         };
-    }, [role]);
+    }, [role, currentUserName]);
 
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });

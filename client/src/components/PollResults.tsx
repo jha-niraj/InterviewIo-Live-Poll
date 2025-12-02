@@ -1,5 +1,6 @@
 import type { PollResults as PollResultsType } from '../types';
 import Badge from './Badge';
+import ChatPopup from './ChatPopup';
 
 interface Props {
 	results: PollResultsType;
@@ -162,7 +163,8 @@ const PollResults = ({ results, role, participants = [], onAskNewQuestion, onSto
 					}
 				</div>
 			</div>
-		</div >
+			<ChatPopup />
+		</div>
 	);
 };
 

@@ -137,6 +137,13 @@ export function setupSocketHandlers(io: Server) {
                     return;
                 }
 
+                // Check if student already answered
+                const studentData = connectedStudents.get(socket.data.sessionId);
+                if (studentData && studentData.hasAnswered) {
+                    console.log(`Student ${studentId} already answered, ignoring duplicate`);
+                    return;
+                }
+
                 // Check if student is kicked
                 const isKicked = await studentService.isStudentKicked(studentId);
                 if (isKicked) {
@@ -150,9 +157,9 @@ export function setupSocketHandlers(io: Server) {
                 await pollService.submitAnswer(studentId, pollId, optionId);
 
                 // Update student's answered status
-                const studentData = connectedStudents.get(socket.data.sessionId);
                 if (studentData) {
                     studentData.hasAnswered = true;
+                    console.log(`✅ Student ${studentData.name} answered. Total answered: ${Array.from(connectedStudents.values()).filter(s => s.hasAnswered).length}/${connectedStudents.size}`);
                 }
 
                 // Calculate and broadcast updated results

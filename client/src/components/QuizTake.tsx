@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import { serverUrl } from '../config/urls';
 import { getSessionId, getStudentName } from '../utils/sessionStorage';
@@ -147,13 +147,18 @@ const QuizTake = () => {
             const finalScore = (correctCount / quiz.questions.length) * 100;
             setScore(finalScore);
 
+            // Convert answers object to array format expected by server
+            const answersArray = Object.entries(answers).map(([questionId, selectedAnswer]) => ({
+                questionId,
+                selectedAnswer
+            }));
+
             // Submit to backend
             await axios.post(`${serverUrl}/quiz/submit`, {
                 quizId: quiz.id,
-                sessionId,
+                studentSessionId: sessionId,
                 studentName,
-                answers,
-                score: finalScore,
+                answers: answersArray,
             });
 
             setShowResults(true);
@@ -198,7 +203,7 @@ const QuizTake = () => {
                             <div className="w-16 h-16 border-4 border-purple-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
                         </div>
                         <h2 className="text-xl font-semibold text-gray-900">
-                            Loading niraj...
+                            Loading quiz...
                         </h2>
                     </div>
                 </div>
@@ -225,9 +230,8 @@ const QuizTake = () => {
                 <div className="min-h-screen flex items-center justify-center p-5 bg-[#F2F2F2]">
                     <div className="w-full max-w-3xl bg-white rounded-xl p-12 shadow-sm">
                         <div className="text-center mb-8">
-                            <Badge text="InterVue" />
+                            <Badge text="InterVue Poll" />
                         </div>
-
                         <div className="text-center mb-8">
                             <h1 className="text-3xl font-bold text-gray-900 mb-4">
                                 Quiz Completed! 🎉
@@ -308,106 +312,110 @@ const QuizTake = () => {
     const progress = ((currentQuestionIndex + 1) / quiz.questions.length) * 100;
 
     // Sort attempts by score (descending)
-    const sortedAttempts = quiz.attempts 
+    const sortedAttempts = quiz.attempts
         ? [...quiz.attempts].sort((a, b) => b.score - a.score).slice(0, 5)
         : [];
 
     return (
         <>
             <div className="min-h-screen flex items-center justify-center p-5 bg-[#F2F2F2]">
-                <div className="w-full max-w-6xl flex gap-6">
-                    {/* Main Quiz Area */}
+                <div className="w-full max-w-7xl mx-auto flex flex-col md:flex-row gap-6">
                     <div className="flex-1 bg-white rounded-xl p-12 shadow-sm">
-                    <div className="mb-8 text-center">
-                        <Badge text="InterVue" />
-                        <h1 className="text-2xl font-bold text-gray-900 mt-4 mb-2">
-                            {quiz.title}
-                        </h1>
-                        <p className="text-sm text-gray-600">
-                            {quiz.topic} • {quiz.level}
-                        </p>
-                    </div>
-                    <div className="mb-8">
-                        <div className="flex justify-between text-sm text-gray-600 mb-2">
-                            <span>Question {currentQuestionIndex + 1} of {quiz.questions.length}</span>
-                            <span>{progress.toFixed(0)}% Complete</span>
+                        <div className="flex items-center justify-between">
+                            <div className="mb-8 text-center">
+                                <div className="flex items-start justify-start">
+                                    <Badge text="InterVue Poll" />
+                                </div>
+                                <h1 className="text-2xl text-left font-bold text-gray-900 mt-4 mb-2">
+                                    {quiz.title}
+                                </h1>
+                                <p className="text-sm text-left text-gray-600">
+                                    {quiz.topic} • {quiz.level}
+                                </p>
+                            </div>
+                            <Link to="/student/poll" className="bg-[#8464E1] p-3 text-white rounded-3xl">
+                                Back To Poll
+                            </Link>
                         </div>
-                        <div className="w-full bg-gray-200 rounded-full h-2">
-                            <div
-                                className="bg-gradient-to-r from-[#8F64E1] to-[#1D68BD] h-2 rounded-full transition-all duration-300"
-                                style={{ width: `${progress}%` }}
-                            ></div>
+                        <div className="mb-8">
+                            <div className="flex justify-between text-sm text-gray-600 mb-2">
+                                <span>Question {currentQuestionIndex + 1} of {quiz.questions.length}</span>
+                                <span>{progress.toFixed(0)}% Complete</span>
+                            </div>
+                            <div className="w-full bg-gray-200 rounded-full h-2">
+                                <div
+                                    className="bg-gradient-to-r from-[#8F64E1] to-[#1D68BD] h-2 rounded-full transition-all duration-300"
+                                    style={{ width: `${progress}%` }}
+                                ></div>
+                            </div>
                         </div>
-                    </div>
-                    <div className="mb-8">
-                        <h2 className="text-xl font-semibold text-gray-900 mb-6">
-                            {currentQuestion.question}
-                        </h2>
-                        <div className="space-y-3">
-                            {
-                                currentQuestion.options.map((option, index) => (
-                                    <button
-                                        key={index}
-                                        onClick={() => handleAnswerSelect(option)}
-                                        className={`w-full text-left p-4 rounded-lg border-2 transition-all ${selectedAnswer === option
-                                            ? 'border-purple-600 bg-purple-50'
-                                            : 'border-gray-200 hover:border-purple-300'
-                                            }`}
-                                    >
-                                        <div className="flex items-center gap-3">
-                                            <div
-                                                className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${selectedAnswer === option
-                                                    ? 'border-purple-600 bg-purple-600'
-                                                    : 'border-gray-300'
-                                                    }`}
-                                            >
-                                                {
-                                                    selectedAnswer === option && (
-                                                        <div className="w-2.5 h-2.5 rounded-full bg-white"></div>
-                                                    )
-                                                }
+                        <div className="mb-8">
+                            <h2 className="text-xl font-semibold text-gray-900 mb-6">
+                                {currentQuestion.question}
+                            </h2>
+                            <div className="space-y-3">
+                                {
+                                    currentQuestion.options.map((option, index) => (
+                                        <button
+                                            key={index}
+                                            onClick={() => handleAnswerSelect(option)}
+                                            className={`w-full text-left p-4 rounded-lg border-2 transition-all ${selectedAnswer === option
+                                                ? 'border-purple-600 bg-purple-50'
+                                                : 'border-gray-200 hover:border-purple-300'
+                                                }`}
+                                        >
+                                            <div className="flex items-center gap-3">
+                                                <div
+                                                    className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${selectedAnswer === option
+                                                        ? 'border-purple-600 bg-purple-600'
+                                                        : 'border-gray-300'
+                                                        }`}
+                                                >
+                                                    {
+                                                        selectedAnswer === option && (
+                                                            <div className="w-2.5 h-2.5 rounded-full bg-white"></div>
+                                                        )
+                                                    }
+                                                </div>
+                                                <span className="text-gray-900">{option}</span>
                                             </div>
-                                            <span className="text-gray-900">{option}</span>
-                                        </div>
+                                        </button>
+                                    ))
+                                }
+                            </div>
+                        </div>
+                        <div className="flex justify-between items-center">
+                            <button
+                                onClick={handlePrevious}
+                                disabled={currentQuestionIndex === 0}
+                                className="px-6 py-2 text-gray-600 hover:text-gray-900 disabled:text-gray-300 disabled:cursor-not-allowed transition-colors"
+                            >
+                                ← Previous
+                            </button>
+                            <div className="text-sm text-gray-500">
+                                {Object.keys(answers).length} / {quiz.questions.length} answered
+                            </div>
+                            {
+                                currentQuestionIndex === quiz.questions.length - 1 ? (
+                                    <button
+                                        onClick={handleSubmit}
+                                        disabled={isSubmitting || Object.keys(answers).length !== quiz.questions.length}
+                                        className="bg-gradient-to-r from-[#8F64E1] to-[#1D68BD] text-white px-8 py-3 rounded-3xl text-base font-semibold hover:shadow-lg transition-all disabled:bg-gray-300 disabled:cursor-not-allowed"
+                                    >
+                                        {isSubmitting ? 'Submitting...' : 'Submit Quiz'}
                                     </button>
-                                ))
-                            }
+                                ) : (
+                                    <button
+                                        onClick={handleNext}
+                                        disabled={!selectedAnswer}
+                                        className="px-6 py-2 text-purple-600 hover:text-purple-700 disabled:text-gray-300 disabled:cursor-not-allowed transition-colors font-semibold"
+                                    >
+                                        Next →
+                                    </button>
+                                )}
                         </div>
                     </div>
-                    <div className="flex justify-between items-center">
-                        <button
-                            onClick={handlePrevious}
-                            disabled={currentQuestionIndex === 0}
-                            className="px-6 py-2 text-gray-600 hover:text-gray-900 disabled:text-gray-300 disabled:cursor-not-allowed transition-colors"
-                        >
-                            ← Previous
-                        </button>
-                        <div className="text-sm text-gray-500">
-                            {Object.keys(answers).length} / {quiz.questions.length} answered
-                        </div>
-                        {
-                            currentQuestionIndex === quiz.questions.length - 1 ? (
-                                <button
-                                    onClick={handleSubmit}
-                                    disabled={isSubmitting || Object.keys(answers).length !== quiz.questions.length}
-                                    className="bg-gradient-to-r from-[#8F64E1] to-[#1D68BD] text-white px-8 py-3 rounded-3xl text-base font-semibold hover:shadow-lg transition-all disabled:bg-gray-300 disabled:cursor-not-allowed"
-                                >
-                                    {isSubmitting ? 'Submitting...' : 'Submit Quiz'}
-                                </button>
-                            ) : (
-                                <button
-                                    onClick={handleNext}
-                                    disabled={!selectedAnswer}
-                                    className="px-6 py-2 text-purple-600 hover:text-purple-700 disabled:text-gray-300 disabled:cursor-not-allowed transition-colors font-semibold"
-                                >
-                                    Next →
-                                </button>
-                            )}
-                        </div>
-                    </div>
-
-                    {/* Leaderboard Sidebar */}
-                    <div className="w-80 bg-white rounded-xl p-6 shadow-sm">
+                    <div className="w-full md:w-80 bg-white rounded-xl p-6 shadow-sm">
                         <div className="flex items-center gap-2 mb-6">
                             <svg className="w-5 h-5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
                                 <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
@@ -415,69 +423,74 @@ const QuizTake = () => {
                             <h3 className="text-lg font-bold text-gray-900">Leaderboard</h3>
                         </div>
 
-                        {sortedAttempts.length === 0 ? (
-                            <div className="text-center py-8">
-                                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                    <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                                    </svg>
-                                </div>
-                                <p className="text-sm text-gray-500 mb-2">No attempts yet</p>
-                                <p className="text-xs text-gray-400">Be the first to complete this quiz!</p>
-                            </div>
-                        ) : (
-                            <div className="space-y-3">
-                                {sortedAttempts.map((attempt, index) => (
-                                    <div
-                                        key={attempt.id}
-                                        className={`p-4 rounded-lg border-2 transition-all ${
-                                            index === 0
-                                                ? 'border-yellow-400 bg-yellow-50'
-                                                : index === 1
-                                                ? 'border-gray-300 bg-gray-50'
-                                                : index === 2
-                                                ? 'border-orange-300 bg-orange-50'
-                                                : 'border-gray-200 bg-white'
-                                        }`}
-                                    >
-                                        <div className="flex items-center gap-3">
-                                            <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${
-                                                index === 0
-                                                    ? 'bg-yellow-400 text-white'
-                                                    : index === 1
-                                                    ? 'bg-gray-400 text-white'
-                                                    : index === 2
-                                                    ? 'bg-orange-400 text-white'
-                                                    : 'bg-gray-200 text-gray-600'
-                                            }`}>
-                                                {index + 1}
-                                            </div>
-                                            <div className="flex-1 min-w-0">
-                                                <p className="text-sm font-semibold text-gray-900 truncate">
-                                                    {attempt.studentName}
-                                                </p>
-                                                <p className="text-xs text-gray-500">
-                                                    {attempt.score.toFixed(0)}% • {Math.round((attempt.score / 100) * attempt.totalQuestions)}/{attempt.totalQuestions}
-                                                </p>
-                                            </div>
-                                            {index === 0 && (
-                                                <svg className="w-5 h-5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
-                                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                                </svg>
-                                            )}
-                                        </div>
+                        {
+                            sortedAttempts.length === 0 ? (
+                                <div className="text-center py-8">
+                                    <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                        <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                        </svg>
                                     </div>
-                                ))}
-                            </div>
-                        )}
-
-                        {sortedAttempts.length > 0 && (
-                            <div className="mt-6 pt-6 border-t border-gray-200">
-                                <p className="text-xs text-gray-500 text-center">
-                                    Top {sortedAttempts.length} of {quiz.attempts?.length || 0} attempts
-                                </p>
-                            </div>
-                        )}
+                                    <p className="text-sm text-gray-500 mb-2">No attempts yet</p>
+                                    <p className="text-xs text-gray-400">Be the first to complete this quiz!</p>
+                                </div>
+                            ) : (
+                                <div className="space-y-3">
+                                    {
+                                        sortedAttempts.map((attempt, index) => (
+                                            <div
+                                                key={attempt.id}
+                                                className={`p-4 rounded-lg border-2 transition-all ${index === 0
+                                                    ? 'border-yellow-400 bg-yellow-50'
+                                                    : index === 1
+                                                        ? 'border-gray-300 bg-gray-50'
+                                                        : index === 2
+                                                            ? 'border-orange-300 bg-orange-50'
+                                                            : 'border-gray-200 bg-white'
+                                                    }`}
+                                            >
+                                                <div className="flex items-center gap-3">
+                                                    <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${index === 0
+                                                        ? 'bg-yellow-400 text-white'
+                                                        : index === 1
+                                                            ? 'bg-gray-400 text-white'
+                                                            : index === 2
+                                                                ? 'bg-orange-400 text-white'
+                                                                : 'bg-gray-200 text-gray-600'
+                                                        }`}>
+                                                        {index + 1}
+                                                    </div>
+                                                    <div className="flex-1 min-w-0">
+                                                        <p className="text-sm font-semibold text-gray-900 truncate">
+                                                            {attempt.studentName}
+                                                        </p>
+                                                        <p className="text-xs text-gray-500">
+                                                            Score: {attempt.score.toFixed(0)}
+                                                        </p>
+                                                    </div>
+                                                    {
+                                                        index === 0 && (
+                                                            <svg className="w-5 h-5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+                                                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                                            </svg>
+                                                        )
+                                                    }
+                                                </div>
+                                            </div>
+                                        ))
+                                    }
+                                </div>
+                            )
+                        }
+                        {
+                            sortedAttempts.length > 0 && (
+                                <div className="mt-6 pt-6 border-t border-gray-200">
+                                    <p className="text-xs text-gray-500 text-center">
+                                        Top {sortedAttempts.length} of {quiz.attempts?.length || 0} attempts
+                                    </p>
+                                </div>
+                            )
+                        }
                     </div>
                 </div>
             </div>
